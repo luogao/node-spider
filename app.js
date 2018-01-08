@@ -4,10 +4,11 @@ var superagent = require('superagent');
 var cheerio = require('cheerio');
 var fs = require("fs");
 var mkdirp = require('mkdirp');
-var url = 'http://www.facets.la/'
+var url = 'http://www.facets.la'
 // 调用 express 实例，它是一个函数，不带参数调用时，会返回一个 express 实例，将这个变量赋予 app 变量。
 var app = express();
 var dir = './images';
+var subUrlArr = []
 mkdirp(dir, function (err) {
     if (err) {
         console.log(err);
@@ -28,22 +29,47 @@ superagent
     .end(function (err, sres) {
         // 常规的错误处理
         if (err) {
-            return next(err);
+            console.log(err)
         }
         var $ = cheerio.load(sres.text);
-        var data = {
-            body: sres
-        }
-        var urlArr = [];
-        $('.thumb-image').find('img').each(function (index, el) {
-            var subUrl = $(el).attr('src')
-            subUrl = subUrl.replace('/thumbnail/T', '/wallpaper/W')
-            urlArr.push(subUrl)
+        let downloadUrlArrRequest = []
+        let finalUrl = []
+        $('.thumb-image').find('a').each(function (index, el) {
+            var subUrl = $(el).attr('href')
+            subUrlArr.push(subUrl)
         })
-        urlArr.map((el, index) => {
-            download(el)
+        subUrlArr.forEach((mainURl, index) => {
+            downloadUrlArr.push(getDownloadUrl(mainURl))
+        })
+        Promise.all(downloadUrlArr).then(res => {
+            finalUrl = res
         })
     });
+
+function getDownloadUrl(url) {
+    let imgUrl = '';
+    return new Promise((resolve, reject) => {
+        superagent
+            .get(url)
+            .end(function (err, res) {
+                if (res.ok) {
+                    let $ = cheerio.load(res.text);
+                    let condition = ($('div.size13').find("a").text() == "Download Wallpaper")
+                    if (condition) {
+                        imgUrl = $('div.size13').find("a").attr("href")
+                    } else {
+                        imgUrl = $('#facet-image > img').attr('src')
+                    }
+                    resolve(imgUrl)
+                } else {
+                    // resolve('请手动下载' + url)
+                }
+            })
+    })
+}
+
+
+
 var download = function (url) {
     return new Promise(function (resolve, reject) {
         superagent.get(url).end((err, res) => {
@@ -51,8 +77,10 @@ var download = function (url) {
                 reject(url + '下载失败')
             } else {
                 console.log(url + '下载中')
-                fs.writeFileSync(dir + "/" + Math.floor(Math.random() * 100000) + url.substr(-4, 4), res.body, null)
-                resolve(url + '下载完成')
+                fs.writeFile(dir + "/" + Math.floor(Math.random() * 100000) + url.substr(-4, 4), res.body, function () {
+                    console.log(url + '下载完成')
+                })
+                resolve()
             }
         })
     })
