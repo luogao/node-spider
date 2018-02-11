@@ -1,29 +1,24 @@
 var path = require('path')
-var tesseratc = require('tesseract.js')
+var tesseratc = require('node-tesseract')
 var image = path.resolve(__dirname, 'test.png')
 
-tesseratc.recognize(image)
-    .progress(function(p) { console.log('progress', p) })
-    .then(data => {
-        console.log('then\n', data.text)
+function imageReader(image, options) {
+    let _options = Object.assign({
+        psm: 7
+    }, options)
+    return new Promise((resolve, reject) => {
+        tesseratc.process(image, _options, (err, text) => {
+            if (err) {
+                return reject(err)
+            } else {
+                resolve(text)
+            }
+        })
     })
-    .catch(err => {
-        console.log('catch\n', err)
-    })
-    .finally(e => {
-        console.log('finally\n')
-    })
+}
 
-
-
-//     var path = require('path')
-// var tesseratc = require('node-tesseract')
-// var image = path.resolve(__dirname, 'test.png')
-
-// tesseratc.process(image,function(err, text){
-//     if(err){
-//         console.error(err)
-//     }else{
-//         console.log(text)
-//     }
-// })
+imageReader(image).then(text => {
+    console.log(text)
+}).catch(err => {
+    console.log(err)
+})
