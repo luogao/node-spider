@@ -10,9 +10,18 @@
 
 <body>
     <div>HELLO WORLD</div>
-    <form action="/">
-        <input type="text">
+    <form action="/getinfo" method="POST">
+        <input type="text" name="link">
+        <button>submit</button>
     </form>
+    <% if (category.lenght) { %>
+        for(var i = 0; i<category.lenght; i++){
+            <p><%= category[i].favicon %></p>
+            <p><%= category[i].name %></p>
+            <p><%= category[i].display_name %></p>
+            <p><%= category[i].protocol %></p>
+        }
+    <% } %>
 </body>
 
 </html>
