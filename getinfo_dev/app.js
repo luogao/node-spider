@@ -64,23 +64,27 @@ const getInfo = async (url) => {
     }
 }
 
-// app.get('/getinfo', function (req, res) {
+// app.post('/getinfo', function (req, res) {
 //     const link = req.body.link
 //     if (link) {
 //         getInfo(link).then(data => {
-//             console.log(data)
-//             res.redirect('/')
+//             res.send(data)
 //         }).catch(err => {
 //             console.log(err)
 //         })
 //     }
 // });
 
-app.get('/getinfo', function (req, res) {
+
+app.get('/api/', function (req, res) {
+    res.send('hello world!')
+});
+
+
+app.get('/api/getinfo', function (req, res) {
     const link = 'https://juejin.im/post/5aab40bef265da23826dba61?utm_medium=fe&utm_source=weixinqun'
     if (link) {
         getInfo(link).then(data => {
-            console.log(data)
             res.send(data)
         }).catch(err => {
             console.log(err)
