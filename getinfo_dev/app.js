@@ -67,7 +67,7 @@ const getInfo = async (url) => {
                     })
                     const data = {
                         read_title,
-                        favicon,
+                        favicon: favicon ? favicon : null,
                         host_name: urlObj.host,
                         host_display_name: urlObj.host,
                         host_protocol: urlObj.protocol
