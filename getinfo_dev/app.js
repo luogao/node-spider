@@ -5,10 +5,25 @@ const cheerio = require('cheerio');
 const bodyParser = require('body-parser');
 const { URL } = require('url');
 const AV = require('leancloud-storage');
+const cors = require('cors')
+
 const appId = 'Luwn37983MFGl7WXp5Pc5GfR-gzGzoHsz';
 const appKey = 'SnC2PpwJR5qJu1HQedf0m8QC';
+const whitelist = ['http://localhost:8080', 'https://lglzy.cn']
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
+}
 
 AV.init({ appId, appKey });
+
+app.use(cors(corsOptions))// 设置跨域
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '1mb' }));
 
