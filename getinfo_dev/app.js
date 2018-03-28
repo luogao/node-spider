@@ -22,7 +22,7 @@ const corsOptions = {
 
 AV.init({ appId, appKey });
 
-app.use(cors(corsOptions))// 设置跨域
+app.use(cors())// 设置跨域
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '1mb' }));
@@ -43,6 +43,7 @@ const getInfo = async (url) => {
                     const data = {
                         read_title,
                         favicon: result[0].get('favicon'),
+                        hostId: result[0].get('objectId'),
                         host_name: urlObj.host,
                         host_display_name: urlObj.host,
                         host_protocol: urlObj.protocol
